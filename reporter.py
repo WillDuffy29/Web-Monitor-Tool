@@ -1,33 +1,39 @@
 import json
 
 def report():
+    # Load all entries from the log file
     with open("log.json", "r") as file:
         log = json.load(file)
     
+    # Group log entries by URL into a dictionary
     sites = {}
     for entry in log:
         if entry["url"] not in sites:
-            sites[entry["url"]] = []
+            sites[entry["url"]] = [] # Create a new list for this URL if not seen before
         sites[entry["url"]].append(entry)
 
+    # Calculate statistics for each site
     results = {}
     for site in sites:
         entries = sites[site]
-        total = len(entries)
+        total = len(entries) # Total number of checks for this site
         
+        # Count online entries
         online_entries = []
         for e in entries:
             if e["status"] == "Online":
                 online_entries.append(e)
         
         online = len(online_entries)
-        offline = total - online
+        offline = total - online # Offline count derived from total minus online
 
+        # Collect valid response times, excluding None values from unreachable sites
         times = []
         for e in entries:
             if e["response_time_ms"] is not None:
                 times.append(e["response_time_ms"])
         
+        # Calculate average, best and worst response times
         if times:
             average_time = sum(times) / len(times)
         else:
@@ -36,6 +42,7 @@ def report():
         best_time = min(times) if times else None
         worst_time = max(times) if times else None
 
+        # Store calculated stats for this site
         results[site] = {
             "total": total,
             "online": online,
@@ -45,7 +52,7 @@ def report():
             "worst_time": worst_time
         }
 
-
+    # Display interactive menu
     print("What would you like to see?")
     print("===========================")
     print("1. Total Entries")
@@ -63,7 +70,7 @@ def report():
             print(f"{site} | Total entries: {results[site]['total']}")
         response = input("Would you like more information? (Y/N)): ")
         if response == "Y":
-            report()
+            report() # Restart the report menu
         else:
             print("Have a great day!")
             return
