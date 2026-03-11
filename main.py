@@ -1,5 +1,6 @@
 from checker import check_website
 from logger import save_log
+from reporter import report
 import time
 import json
 
@@ -22,11 +23,29 @@ def start():
         return print("No worries, maybe next time!")
 
 def run_program():
-    while True:
-        for site in sites:
-            result = check_website(site)
-            save_log(result)
-            print(result)
-        time.sleep(120)
+    try:
+        while True:
+            for site in sites:
+                result = check_website(site)
+                save_log(result)
+                print(result)
+            time.sleep(120)
+    except KeyboardInterrupt:
+        print("Program stopped. Goodbye!")
 
-start()
+def entry_message():
+    print("What would you like to do?")
+    print("==========================")
+    print("1. Utilise the program")
+    print("2. Generate a report")
+    print("==========================")
+    decision = int(input("Your choice (1-2): "))
+    if decision == 1:
+        start()
+    elif decision == 2:
+        report()
+    else:
+        print("Invalid input. Try again.")
+        entry_message()
+
+entry_message()
